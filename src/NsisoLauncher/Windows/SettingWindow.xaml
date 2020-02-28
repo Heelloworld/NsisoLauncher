@@ -10,7 +10,7 @@
         xmlns:mainConfig="clr-namespace:NsisoLauncher.Config"
         xmlns:modules="clr-namespace:NsisoLauncherCore.Modules"
         xmlns:net="clr-namespace:NsisoLauncherCore.Net"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Closed="MetroWindow_Closed"
         Title="{StaticResource String.Settingwindow.Title}" Height="450" Width="800" WindowStartupLocation="CenterScreen">
     <Controls:MetroWindow.Resources>
         <!--#region 值转换器-->

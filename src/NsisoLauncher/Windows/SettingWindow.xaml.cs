@@ -38,6 +38,7 @@ namespace NsisoLauncher.Windows
 
         private void FirstBinding()
         {
+            config = App.Config?.MainConfig;
             AccentColorComboBox.ItemsSource = ThemeManager.Accents;
             appThmeComboBox.ItemsSource = ThemeManager.AppThemes;
             authModuleCombobox.ItemsSource = authModules;
@@ -46,9 +47,6 @@ namespace NsisoLauncher.Windows
 
         private async void Refresh()
         {
-            //深度克隆设置
-            config = DeepCloneObject(App.Config.MainConfig);
-
             //绑定content设置
             this.DataContext = config;
 
@@ -147,60 +145,6 @@ namespace NsisoLauncher.Windows
             e.Handled = re.IsMatch(e.Text);
         }
 
-        //保存按钮点击后
-        private async void saveButton_Click(object sender, RoutedEventArgs e)
-        {
-            #region 实时修改
-            switch (config.Environment.GamePathType)
-            {
-                case GameDirEnum.ROOT:
-                    App.Handler.GameRootPath = Path.GetFullPath(".minecraft");
-                    break;
-                case GameDirEnum.APPDATA:
-                    App.Handler.GameRootPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "\\.minecraft";
-                    break;
-                case GameDirEnum.PROGRAMFILES:
-                    App.Handler.GameRootPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles) + "\\.minecraft";
-                    break;
-                case GameDirEnum.CUSTOM:
-                    App.Handler.GameRootPath = config.Environment.GamePath + "\\.minecraft";
-                    break;
-                default:
-                    throw new ArgumentException("判断游戏目录类型时出现异常，请检查配置文件中GamePathType节点");
-            }
-            App.Handler.VersionIsolation = config.Environment.VersionIsolation;
-            App.Downloader.CheckFileHash = config.Download.CheckDownloadFileHash;
-            #endregion
-
-            App.Config.MainConfig = config;
-
-            if (_isGameSettingChanged)
-            {
-                if (App.Config.MainConfig.Environment.VersionIsolation)
-                {
-                    await GameHelper.SaveOptionsAsync(
-                    (List<VersionOption>)versionOptionsGrid.ItemsSource,
-                    App.Handler,
-                    (NsisoLauncherCore.Modules.Version)VersionsComboBox.SelectedItem);
-                }
-                else
-                {
-                    await GameHelper.SaveOptionsAsync(
-                    (List<VersionOption>)versionOptionsGrid.ItemsSource,
-                    App.Handler,
-                    new NsisoLauncherCore.Modules.Version() { ID = "null" });
-                }
-            }
-
-            App.Config.Save();
-            await this.ShowMessageAsync("保存成功", "所有设置已成功保存在本地");
-        }
-
-        //取消按钮点击后
-        private void cancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
 
         private async void VersionsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -243,29 +187,6 @@ namespace NsisoLauncher.Windows
             }
         }
 
-        #region Tools
-        private static T DeepCloneObject<T>(T t) where T : class
-        {
-            T model = Activator.CreateInstance<T>();                     //实例化一个T类型对象
-            PropertyInfo[] propertyInfos = model.GetType().GetProperties();     //获取T对象的所有公共属性
-            foreach (PropertyInfo propertyInfo in propertyInfos)
-            {
-                //判断值是否为空，如果空赋值为null见else
-                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                {
-                    //如果convertsionType为nullable类，声明一个NullableConverter类，该类提供从Nullable类到基础基元类型的转换
-                    NullableConverter nullableConverter = new NullableConverter(propertyInfo.PropertyType);
-                    //将convertsionType转换为nullable对的基础基元类型
-                    propertyInfo.SetValue(model, Convert.ChangeType(propertyInfo.GetValue(t, null), nullableConverter.UnderlyingType), null);
-                }
-                else
-                {
-                    propertyInfo.SetValue(model, Convert.ChangeType(propertyInfo.GetValue(t, null), propertyInfo.PropertyType), null);
-                }
-            }
-            return model;
-        }
-        #endregion
         private void javaPathComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Java java = (Java)(((System.Windows.Controls.ComboBox)sender).SelectedItem);
@@ -398,6 +319,51 @@ namespace NsisoLauncher.Windows
         private void VersionOptionsGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             _isGameSettingChanged = true;
+        }
+
+        private async void MetroWindow_Closed(object sender, EventArgs e)
+        {
+            #region 实时修改
+            switch (config.Environment.GamePathType)
+            {
+                case GameDirEnum.ROOT:
+                    App.Handler.GameRootPath = Path.GetFullPath(".minecraft");
+                    break;
+                case GameDirEnum.APPDATA:
+                    App.Handler.GameRootPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData) + "\\.minecraft";
+                    break;
+                case GameDirEnum.PROGRAMFILES:
+                    App.Handler.GameRootPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles) + "\\.minecraft";
+                    break;
+                case GameDirEnum.CUSTOM:
+                    App.Handler.GameRootPath = config.Environment.GamePath + "\\.minecraft";
+                    break;
+                default:
+                    throw new ArgumentException("判断游戏目录类型时出现异常，请检查配置文件中GamePathType节点");
+            }
+            App.Handler.VersionIsolation = config.Environment.VersionIsolation;
+            App.Downloader.CheckFileHash = config.Download.CheckDownloadFileHash;
+            #endregion
+
+            if (_isGameSettingChanged)
+            {
+                if (App.Config.MainConfig.Environment.VersionIsolation)
+                {
+                    await GameHelper.SaveOptionsAsync(
+                    (List<VersionOption>)versionOptionsGrid.ItemsSource,
+                    App.Handler,
+                    (NsisoLauncherCore.Modules.Version)VersionsComboBox.SelectedItem);
+                }
+                else
+                {
+                    await GameHelper.SaveOptionsAsync(
+                    (List<VersionOption>)versionOptionsGrid.ItemsSource,
+                    App.Handler,
+                    new NsisoLauncherCore.Modules.Version() { ID = "null" });
+                }
+            }
+
+            App.Config.Save();
         }
     }
 }

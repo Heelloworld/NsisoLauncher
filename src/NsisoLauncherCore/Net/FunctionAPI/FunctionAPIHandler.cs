@@ -14,6 +14,7 @@ namespace NsisoLauncherCore.Net.FunctionAPI
         public string VersionListURL { get; set; } = GetDownloadUrl.MojangVersionUrl;
         public string JavaListURL { get; set; } = GetDownloadUrl.BMCLUrl + "java/list";
         public string ForgeListURL { get; set; } = GetDownloadUrl.BMCLUrl + "forge/minecraft";
+        public string ForgeDownloadBaseURL { get; set; } = GetDownloadUrl.BMCLUrl + "forge/download";
         public string NewListURL { get; set; } = "https://authentication.x-speed.cc/mcbbsNews/";
 
         public FunctionAPIHandler(DownloadSource lib)
@@ -29,12 +30,14 @@ namespace NsisoLauncherCore.Net.FunctionAPI
                     VersionListURL = GetDownloadUrl.BMCLVersionURL;
                     JavaListURL = GetDownloadUrl.BMCLUrl + "java/list";
                     ForgeListURL = GetDownloadUrl.BMCLUrl + "forge/minecraft";
+                    ForgeDownloadBaseURL = GetDownloadUrl.BMCLUrl + "forge/download";
                     break;
 
                 case DownloadSource.MCBBS:
                     VersionListURL = GetDownloadUrl.MCBBSVersionURL;
                     JavaListURL = GetDownloadUrl.MCBBSUrl + "java/list";
                     ForgeListURL = GetDownloadUrl.MCBBSUrl + "forge/minecraft";
+                    ForgeDownloadBaseURL = GetDownloadUrl.MCBBSUrl + "forge/download";
                     break;
             }
         }

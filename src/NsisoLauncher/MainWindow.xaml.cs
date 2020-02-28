@@ -508,7 +508,7 @@ namespace NsisoLauncher
                             return;
                         case AuthState.ERR_INVALID_CRDL:
                             await this.ShowMessageAsync("验证失败：您的登录账号或密码错误",
-                                string.Format("请您确认您输入的账号密码正确。具体信息：{0}", authResult.Error.ErrorMessage));
+                                string.Format("请您确认您输入的账号密码正确。也有可能是因为验证请求频率过高，被服务器暂时禁止访问。具体信息：{0}", authResult.Error.ErrorMessage));
                             return;
                         case AuthState.ERR_NOTFOUND:
                             if (args.AuthNode.AuthType == AuthenticationType.CUSTOM_SERVER || args.AuthNode.AuthType == AuthenticationType.AUTHLIB_INJECTOR)
@@ -528,8 +528,16 @@ namespace NsisoLauncher
                                 string.Format("具体信息：{0}", authResult.Error.ErrorMessage));
                             return;
                         case AuthState.ERR_INSIDE:
-                            await this.ShowMessageAsync("验证失败：启动器内部错误",
-                                string.Format("建议您联系启动器开发者进行解决。具体信息：{0}", authResult.Error.ErrorMessage));
+                            if (authResult.Error.Exception != null)
+                            {
+                                App.LogHandler.AppendFatal(authResult.Error.Exception);
+                            }
+                            else
+                            {
+                                await this.ShowMessageAsync("验证失败：启动器内部错误(无exception对象)",
+                                    string.Format("建议您联系启动器开发者进行解决。具体信息：{0}：\n\r{1}",
+                                    authResult.Error.ErrorMessage, authResult.Error.Exception?.ToString()));
+                            }
                             return;
                         default:
                             await this.ShowMessageAsync("验证失败：未知错误",
@@ -760,7 +768,11 @@ namespace NsisoLauncher
                     {
                         Application.Current.Shutdown();
                     }
-                    this.WindowState = WindowState.Minimized;
+
+                    if (!result.Process.HasExited)
+                    {
+                        this.WindowState = WindowState.Minimized;
+                    }
 
                     mainPanel.Refresh();
 
@@ -898,12 +910,13 @@ namespace NsisoLauncher
             return true;
         }
 
-        private void CancelLaunching(LaunchResult result)
+        private async void CancelLaunching(LaunchResult result)
         {
             if (!result.Process.HasExited)
             {
                 result.Process.Kill();
             }
+            await this.ShowMessageAsync("已取消启动", "已取消启动");
         }
 
         private async Task CheckUpdate()

@@ -45,11 +45,11 @@
         </Grid>
         <Button x:Name="volumeButton" Style ="{DynamicResource MahApps.Metro.Styles.MetroCircleButtonStyle}"
                 Width="30" Height="30" Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right"
-                BorderBrush="White" Foreground="White" Click="volumeButton_Click" Grid.ColumnSpan="2" Visibility="Hidden">
+                BorderBrush="White" Foreground="White" Click="volumeButton_Click" Visibility="Hidden">
             <iconPacks:FontAwesome x:Name="volumeButtonIcon" Kind="VolumeUpSolid" />
         </Button>
 
-        <userControl:ServerInfoControl x:Name="serverInfoControl" Height="125" Margin="10,10,118,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <userControl:ServerInfoControl x:Name="serverInfoControl" Height="125" Margin="10,10,300,0" VerticalAlignment="Top"/>
 
         <Grid x:Name="loadingGrid" Visibility="Hidden" Grid.ColumnSpan="3">
             <Rectangle>
@@ -61,9 +61,9 @@
                 </Rectangle.Effect>
             </Rectangle>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <controls:ProgressRing x:Name="loadingRing" Width="70" Height="70" IsActive="False"/>
-                <TextBlock Text="{DynamicResource String.Mainwindow.Launching}" TextAlignment="Center" Foreground="Gray"/>
-                <Button x:Name="cancelLaunchButton" Content="取消启动" Height="30" Width="70" Margin="0,10,0,0" Opacity="0.6"/>
+                <controls:ProgressRing x:Name="loadingRing" IsActive="False"/>
+                <TextBlock Text="{DynamicResource String.Mainwindow.Launching}" TextAlignment="Center" Margin="0,10,0,0" Foreground="{DynamicResource WhiteColorBrush}"/>
+                <Button x:Name="cancelLaunchButton" Content="取消启动" Padding="10,0" Margin="0,10,0,0"/>
             </StackPanel>
             <TextBlock x:Name="launchInfoBlock" Height="20" TextAlignment="Right" Foreground="Gray" VerticalAlignment="Bottom" Margin="10,0"/>
         </Grid>

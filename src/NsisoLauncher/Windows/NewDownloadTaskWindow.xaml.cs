@@ -229,7 +229,7 @@ namespace NsisoLauncher.Windows
         {
             string forgePath = NsisoLauncherCore.PathManager.TempDirectory + string.Format(@"\Forge_{0}-Installer.jar", forge.Build);
             DownloadTask dt = new DownloadTask("forge核心",
-                string.Format("https://bmclapi2.bangbang93.com/forge/download/{0}", forge.Build),
+                string.Format("{0}/{1}", apiHandler.ForgeDownloadBaseURL, forge.Build),
                 forgePath);
             dt.Todo = new Func<ProgressCallback, CancellationToken, Exception>((callback, cancelToken) =>
             {
