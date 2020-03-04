@@ -72,6 +72,19 @@ namespace NsisoLauncherCore.Net.MojangApi.Api
                 rawMessage = await httpResponse.Content.ReadAsStringAsync();
                 httpResponse.EnsureSuccessStatusCode();
             }
+            catch (TaskCanceledException ex)
+            {
+                return new Response()
+                {
+                    IsSuccess = false,
+                    Error = new Error()
+                    {
+                        ErrorMessage = ex.Message,
+                        ErrorTag = ex.Message,
+                        Exception = ex
+                    }
+                };
+            }
             catch (Exception ex)
             {
                 return new Response()
@@ -124,6 +137,19 @@ namespace NsisoLauncherCore.Net.MojangApi.Api
                 httpResponse = await Client.PostAsync(endpoint.Address, contents);
                 rawMessage = await httpResponse.Content.ReadAsStringAsync();
                 httpResponse.EnsureSuccessStatusCode();
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Response()
+                {
+                    IsSuccess = false,
+                    Error = new Error()
+                    {
+                        ErrorMessage = ex.Message,
+                        ErrorTag = ex.Message,
+                        Exception = ex
+                    }
+                };
             }
             catch (Exception ex)
             {
@@ -181,6 +207,19 @@ namespace NsisoLauncherCore.Net.MojangApi.Api
                 httpResponse = await Client.PostAsync(endpoint.Address, new FormUrlEncodedContent(toEncode));
                 rawMessage = await httpResponse.Content.ReadAsStringAsync();
                 httpResponse.EnsureSuccessStatusCode();
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Response()
+                {
+                    IsSuccess = false,
+                    Error = new Error()
+                    {
+                        ErrorMessage = ex.Message,
+                        ErrorTag = ex.Message,
+                        Exception = ex
+                    }
+                };
             }
             catch (Exception ex)
             {
@@ -261,6 +300,19 @@ namespace NsisoLauncherCore.Net.MojangApi.Api
                 }
 
             }
+            catch (TaskCanceledException ex)
+            {
+                return new Response()
+                {
+                    IsSuccess = false,
+                    Error = new Error()
+                    {
+                        ErrorMessage = ex.Message,
+                        ErrorTag = ex.Message,
+                        Exception = ex
+                    }
+                };
+            }
             catch (Exception ex)
             {
                 if (httpResponse.StatusCode == HttpStatusCode.Unauthorized ||
@@ -326,6 +378,19 @@ namespace NsisoLauncherCore.Net.MojangApi.Api
                 rawMessage = await httpResponse.Content.ReadAsStringAsync();
                 httpResponse.EnsureSuccessStatusCode();
 
+            }
+            catch (TaskCanceledException ex)
+            {
+                return new Response()
+                {
+                    IsSuccess = false,
+                    Error = new Error()
+                    {
+                        ErrorMessage = ex.Message,
+                        ErrorTag = ex.Message,
+                        Exception = ex
+                    }
+                };
             }
             catch (Exception ex)
             {

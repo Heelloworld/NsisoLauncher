@@ -61,22 +61,34 @@ namespace NsisoLauncher
         #region 自定义
         public async void CustomizeRefresh()
         {
+            #region 自定义启动器标题
             if (!string.IsNullOrWhiteSpace(App.Config.MainConfig.Customize.LauncherTitle))
             {
                 this.Title = App.Config.MainConfig.Customize.LauncherTitle;
             }
+            #endregion
+
+            #region 自定义启动器背景图片
             if (App.Config.MainConfig.Customize.CustomBackGroundPicture)
             {
-                string[] files = Directory.GetFiles(Path.GetDirectoryName(App.Config.MainConfigPath), "bgpic_?.png");
-                if (files.Count() != 0)
+                string bgDir = PathManager.BaseStorageDirectory + "\\Background";
+                if (Directory.Exists(bgDir))
                 {
-                    Random random = new Random();
-                    ImageBrush brush = new ImageBrush(new BitmapImage(new Uri(files[random.Next(files.Count())])))
-                    { TileMode = TileMode.FlipXY, AlignmentX = AlignmentX.Right, Stretch = Stretch.UniformToFill };
-                    this.Background = brush;
+                    string[] files = Directory.GetFiles(bgDir).Where(x =>
+                    {
+                        string ext = Path.GetExtension(x);
+                        return ext == ".jpg" || ext == ".png" || ext == ".gif" || ext == ".bmp";
+                    }).ToArray();
+                    if (files.Count() != 0)
+                    {
+                        Random random = new Random();
+                        bgImage.Source = new BitmapImage(new Uri(files[random.Next(files.Count())]));
+                    }
                 }
             }
+            #endregion
 
+            #region 自定义服务器
             if (App.Config.MainConfig.User.Nide8ServerDependence)
             {
                 try
@@ -113,35 +125,41 @@ namespace NsisoLauncher
             {
                 serverInfoControl.SetServerInfo(App.Config.MainConfig.Server);
             }
+            #endregion
 
+            #region 自定义背景音乐
             if (App.Config.MainConfig.Customize.CustomBackGroundMusic)
             {
-                string[] files = Directory.GetFiles(Path.GetDirectoryName(App.Config.MainConfigPath), "bgmusic_?.mp3");
-                if (files.Count() != 0)
+                string musicDir = PathManager.BaseStorageDirectory + "\\Music";
+                if (Directory.Exists(musicDir))
                 {
-                    Random random = new Random();
-                    mediaElement.Source = new Uri(files[random.Next(files.Count())]);
-                    this.volumeButton.Visibility = Visibility.Visible;
-                    mediaElement.Play();
-                    mediaElement.Volume = 0;
-                    await Task.Factory.StartNew(() =>
+                    string[] files = Directory.GetFiles(musicDir, "*.mp3");
+                    if (files.Count() != 0)
                     {
-                        try
+                        Random random = new Random();
+                        mediaElement.Source = new Uri(files[random.Next(files.Count())]);
+                        this.volumeButton.Visibility = Visibility.Visible;
+                        mediaElement.Play();
+                        mediaElement.Volume = 0;
+                        await Task.Factory.StartNew(() =>
                         {
-                            for (int i = 0; i < 50; i++)
+                            try
                             {
-                                this.Dispatcher.Invoke(new Action(() =>
+                                for (int i = 0; i < 50; i++)
                                 {
-                                    this.mediaElement.Volume += 0.01;
-                                }));
-                                Thread.Sleep(50);
+                                    this.Dispatcher.Invoke(new Action(() =>
+                                    {
+                                        this.mediaElement.Volume += 0.01;
+                                    }));
+                                    Thread.Sleep(50);
+                                }
                             }
-                        }
-                        catch (Exception) { }
-                    });
+                            catch (Exception) { }
+                        });
+                    }
                 }
             }
-
+            #endregion
         }
 
         private void volumeButton_Click(object sender, RoutedEventArgs e)
@@ -463,7 +481,7 @@ namespace NsisoLauncher
                 //如果验证方式不是离线验证
                 if (args.AuthNode.AuthType != AuthenticationType.OFFLINE)
                 {
-                    string currentLoginType = string.Format("正在进行{0}中...", args.AuthNode.Name);
+                    string currentLoginType = string.Format("正在进行{0}验证中...", args.AuthNode.Name);
                     string loginMsg = "这需要联网进行操作，可能需要一分钟的时间";
                     var loader = await this.ShowProgressAsync(currentLoginType, loginMsg, true);
 
@@ -504,39 +522,43 @@ namespace NsisoLauncher
                         case AuthState.REQ_LOGIN:
                             args.UserNode.ClearAuthCache();
                             await this.ShowMessageAsync("验证失败：您的登录信息已过期",
-                                string.Format("请您重新进行登录。具体信息：{0}", authResult.Error.ErrorMessage));
+                                string.Format("请您重新进行登录。具体信息：{0}", authResult.Error?.ErrorMessage));
                             return;
                         case AuthState.ERR_INVALID_CRDL:
                             await this.ShowMessageAsync("验证失败：您的登录账号或密码错误",
-                                string.Format("请您确认您输入的账号密码正确。也有可能是因为验证请求频率过高，被服务器暂时禁止访问。具体信息：{0}", authResult.Error.ErrorMessage));
+                                string.Format("请您确认您输入的账号密码正确。也有可能是因为验证请求频率过高，被服务器暂时禁止访问。具体信息：{0}", authResult.Error?.ErrorMessage));
                             return;
                         case AuthState.ERR_NOTFOUND:
                             if (args.AuthNode.AuthType == AuthenticationType.CUSTOM_SERVER || args.AuthNode.AuthType == AuthenticationType.AUTHLIB_INJECTOR)
                             {
                                 await this.ShowMessageAsync("验证失败：代理验证服务器地址有误或账号未找到",
                                 string.Format("请确认您的Authlib-Injector验证服务器（Authlib-Injector验证）或自定义验证服务器（自定义验证）地址正确或确认账号和游戏角色存在。具体信息：{0}",
-                                authResult.Error.ErrorMessage));
+                                authResult.Error?.ErrorMessage));
                             }
                             else
                             {
                                 await this.ShowMessageAsync("验证失败：您的账号未找到",
-                                string.Format("请确认您的账号和游戏角色存在。具体信息：{0}", authResult.Error.ErrorMessage));
+                                string.Format("请确认您的账号和游戏角色存在。具体信息：{0}", authResult.Error?.ErrorMessage));
                             }
+                            return;
+                        case AuthState.ERR_TIMEOUT:
+                            await this.ShowMessageAsync("验证失败：连接验证服务器超时",
+                                "这可能是因为您的网络问题，或者验证服务器不可用。请检查您的网络连接与防火墙设置，并确认验证服务器处于可用状态");
                             return;
                         case AuthState.ERR_OTHER:
                             await this.ShowMessageAsync("验证失败：其他错误",
-                                string.Format("具体信息：{0}", authResult.Error.ErrorMessage));
+                                string.Format("具体信息：{0}", authResult.Error?.ErrorMessage));
                             return;
                         case AuthState.ERR_INSIDE:
-                            if (authResult.Error.Exception != null)
+                            if (authResult.Error?.Exception != null)
                             {
-                                App.LogHandler.AppendFatal(authResult.Error.Exception);
+                                App.LogHandler.AppendFatal(authResult.Error?.Exception);
                             }
                             else
                             {
                                 await this.ShowMessageAsync("验证失败：启动器内部错误(无exception对象)",
                                     string.Format("建议您联系启动器开发者进行解决。具体信息：{0}：\n\r{1}",
-                                    authResult.Error.ErrorMessage, authResult.Error.Exception?.ToString()));
+                                    authResult.Error?.ErrorMessage, authResult.Error?.Exception?.ToString()));
                             }
                             return;
                         default:

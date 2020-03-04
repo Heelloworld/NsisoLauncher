@@ -106,6 +106,14 @@ namespace NsisoLauncher.Windows
                 await this.ShowMessageAsync("您未选择要安装Forge的版本", "您需要选择一个需要安装Forge的Minecraft本体");
                 return;
             }
+
+            if (ver.InheritsVersion != null)
+            {
+                await this.ShowMessageAsync("该版本无法进行Forge安装",
+                    "您选择的游戏版本已经存在版本继承关系，可能已经安装扩展，无法再进行安装，请重新选择");
+                return;
+            }
+
             var loading = await this.ShowProgressAsync("获取Forge列表中", "请稍后");
             loading.SetIndeterminate();
             List<JWForge> result = null;

@@ -1,5 +1,6 @@
 ﻿
 using MahApps.Metro;
+using Microsoft.Win32;
 using NsisoLauncher.Config;
 using NsisoLauncher.Core.Util;
 using NsisoLauncher.Windows;
@@ -47,6 +48,34 @@ namespace NsisoLauncher
 
         private void InitializeApplication(StartupEventArgs e)
         {
+            #region 检查.NET环境
+            const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
+
+            using (RegistryKey ndpKey = Registry.LocalMachine.OpenSubKey(subkey))
+            {
+                if (ndpKey == null)
+                {
+                    MessageBox.Show("当前电脑.NET Framework版本低于4.6，请更新至4.6或以上的新版本");
+                    return;
+                }
+                object releaseObj = ndpKey.GetValue("Release");
+                if (releaseObj != null)
+                {
+                    int release = Convert.ToInt32(releaseObj);
+                    if (release < 393295)
+                    {
+                        MessageBox.Show("当前电脑.NET Framework版本低于4.6，请更新至4.6或以上的新版本");
+                        return;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("当前电脑.NET Framework版本低于4.6，请更新至4.6或以上的新版本");
+                    return;
+                }
+            }
+            #endregion
+
             #region DEBUG初始化
             //debug
             LogHandler = new LogHandler();

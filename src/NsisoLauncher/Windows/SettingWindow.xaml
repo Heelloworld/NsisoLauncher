@@ -377,9 +377,11 @@
 
                         <Expander Header="启动器背景元素设置" Margin="0,0,0,5">
                             <StackPanel>
-                                <CheckBox x:Name="checkBox1" Content="开启自定义背景图片" IsChecked="{Binding Customize.CustomBackGroundPicture}" Margin="0,0,0,2"/>
-                                <CheckBox x:Name="checkBox2" Content="开启自定义背景音乐" IsChecked="{Binding Customize.CustomBackGroundMusic}" Margin="0,0,0,2"/>
-                                <Label Content="*自定义方法请查看启动器教程文档"/>
+                                <CheckBox x:Name="checkBox1" Content="开启自定义背景图片" IsChecked="{Binding Customize.CustomBackGroundPicture}"/>
+                                <Label Content="*自定义背景图片文件夹为NsisoLauncher/Background（支持文件后缀：.jpg .png .bmp .gif）" Margin="0,0,0,10"/>
+                                <CheckBox x:Name="checkBox2" Content="开启自定义背景音乐" IsChecked="{Binding Customize.CustomBackGroundMusic}"/>
+                                <Label Content="*自定义背景音乐文件夹为NsisoLauncher/Music（支持文件后缀：.mp3）" Margin="0,0,0,10"/>
+                                <Label Content="*文件夹需自行创建；若自定义文件夹中有多个文件，则每次随机选择"/>
                             </StackPanel>
                         </Expander>
 

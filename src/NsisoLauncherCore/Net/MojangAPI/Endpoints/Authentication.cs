@@ -115,8 +115,16 @@ namespace NsisoLauncherCore.Net.MojangApi.Endpoints
                 {
                     try
                     {
-                        AuthenticationResponseError error = new AuthenticationResponseError(JObject.Parse(this.Response.RawMessage));
-                        return new AuthenticateResponse(this.Response) { Error = error };
+                        if (this.Response?.RawMessage != null)
+                        {
+                            AuthenticationResponseError error = new AuthenticationResponseError(JObject.Parse(this.Response.RawMessage));
+                            return new AuthenticateResponse(this.Response) { Error = error };
+                        }
+                        else
+                        {
+                            return new AuthenticateResponse(this.Response);
+                        }
+                       
                     }
                     catch (Exception)
                     {

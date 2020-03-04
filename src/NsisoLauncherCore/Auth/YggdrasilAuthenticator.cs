@@ -57,7 +57,14 @@ namespace NsisoLauncherCore.Auth
                             errState = AuthState.ERR_INVALID_CRDL;
                             break;
                         default:
-                            errState = AuthState.ERR_OTHER;
+                            if (result.Error?.Exception is TaskCanceledException)
+                            {
+                                errState = AuthState.ERR_TIMEOUT;
+                            }
+                            else
+                            {
+                                errState = AuthState.ERR_OTHER;
+                            }
                             break;
                     }
 
@@ -126,7 +133,14 @@ namespace NsisoLauncherCore.Auth
                     }
                     else
                     {
-                        state = AuthState.REQ_LOGIN;
+                        if (refreshResult.Error?.Exception is TaskCanceledException)
+                        {
+                            state = AuthState.ERR_TIMEOUT;
+                        }
+                        else
+                        {
+                            state = AuthState.REQ_LOGIN;
+                        }
                     }
                     return new AuthenticateResult(state)
                     {

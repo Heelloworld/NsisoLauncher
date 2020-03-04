@@ -38,6 +38,7 @@ namespace NsisoLauncherCore.Auth
         ERR_INVALID_CRDL,
         ERR_NOTFOUND,
         ERR_METHOD_NOT_ALLOW,
+        ERR_TIMEOUT,
         ERR_OTHER,
         ERR_INSIDE
     }

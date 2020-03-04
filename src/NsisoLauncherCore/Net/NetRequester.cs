@@ -17,7 +17,8 @@ namespace NsisoLauncherCore.Net
         /// <summary>
         /// NsisoLauncher5目前版本号.
         /// </summary>
-        public readonly static string ClientVersion = Assembly.GetExecutingAssembly().GetName().Version.Major.ToString();
+        public readonly static string ClientVersion = string.Format("{0}.{1}",
+            Assembly.GetExecutingAssembly().GetName().Version.Major, Assembly.GetExecutingAssembly().GetName().Version.Minor);
 
         private static HttpClient _client;
         /// <summary>

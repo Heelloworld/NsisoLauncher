@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using NsisoLauncherCore.Net.Tools;
 using System.Threading.Tasks;
 
 namespace NsisoLauncherCore.Net.AuthlibInjectorAPI
@@ -14,10 +15,13 @@ namespace NsisoLauncherCore.Net.AuthlibInjectorAPI
                     apiBase = "https://authlib-injector.yushi.moe/artifact/latest.json";
                     break;
                 case DownloadSource.BMCLAPI:
-                    apiBase = "https://bmclapi2.bangbang93.com/mirrors/authlib-injector/artifact/latest.json";
+                    apiBase = GetDownloadUrl.BMCLUrl + "mirrors/authlib-injector/artifact/latest.json";
+                    break;
+                case DownloadSource.MCBBS:
+                    apiBase = GetDownloadUrl.MCBBSUrl + "mirrors/authlib-injector/artifact/latest.json";
                     break;
                 default:
-                    apiBase = "https://authlib-injector.yushi.moe/artifact/latest.json";
+                    apiBase = GetDownloadUrl.BMCLUrl + "mirrors/authlib-injector/artifact/latest.json";
                     break;
             }
             var jobj = JObject.Parse(await NetRequester.HttpGetStringAsync(apiBase));
